@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EagleWay Trucking — Application</title>
+<meta name="description" content="Apply to EagleWay Trucking — OTR drivers application form.">
+<style>
+  :root{
+    --bg:#0A2A57;
+    --card:#1E3A8A;
+    --accent:#FBBF24;
+    --muted: #cbd5e1;
+    --white:#ffffff;
+  }
+
+  *{box-sizing:border-box}
+
+  body{
+    margin:0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background:var(--bg);
+    color:var(--white);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+
+  .container{
+    width:100%;
+    max-width:720px;
+    background:linear-gradient(180deg, rgba(30,58,138,0.98), rgba(16,40,94,0.98));
+    padding:24px;
+    border-radius:12px;
+    box-shadow:0 8px 30px rgba(2,6,23,0.6);
+  }
+
+  .logo{ text-align:center; margin-bottom:18px }
+  .logo img{ max-width:220px; height:auto; display:inline-block }
+
+  h1{ font-size:1.25rem; margin:0 0 8px; text-align:center }
+  p.lead{ margin:0 0 20px; text-align:center; color:var(--muted) }
+
+  form{ display:grid; gap:12px; grid-template-columns: 1fr 1fr; }
+  form .full{ grid-column:1 / -1; }
+  label{ display:block; font-size:0.875rem; margin-bottom:6px; color:var(--muted) }
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  select{
+    width:100%;
+    padding:10px 12px;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,0.08);
+    background:rgba(255,255,255,0.03);
+    color:var(--white);
+    font-size:0.95rem;
+    outline:none;
+  }
+  input:focus, select:focus{ box-shadow:0 0 0 3px rgba(251,191,36,0.12); border-color:var(--accent) }
+
+  .note{ font-size:0.85rem; color:var(--muted); margin-top:4px }
+
+  .actions{ grid-column:1 / -1; display:flex; gap:12px; align-items:center; margin-top:6px }
+  button[type="submit"]{
+    flex:1;
+    background:var(--accent);
+    color:#000;
+    font-weight:700;
+    padding:12px 16px;
+    border-radius:8px;
+    border:none;
+    cursor:pointer;
+    font-size:1rem;
+  }
+  button[type="submit"]:focus{ box-shadow:0 0 0 4px rgba(251,191,36,0.18) }
+
+  .status{ font-size:0.95rem; color:var(--muted) }
+  .errors{ background:rgba(255,0,0,0.06); color:#ffd1d1; padding:8px 10px; border-radius:8px; font-size:0.9rem; display:none }
+
+  /* Responsive */
+  @media (max-width:640px){
+    form{ grid-template-columns: 1fr }
+    .logo img{ max-width:180px }
+  }
+</style>
+</head>
+<body>
+  <main class="container" role="main">
+    <div class="logo" aria-hidden="false">
+      <img src="logo.png" alt="EagleWay Trucking logo">
+    </div>
+
+    <h1>Driver Application</h1>
+    <p class="lead">Please complete this short application to be considered for OTR driver opportunities.</p>
+
+    <form id="applicationForm" method="post" action="/api/apply" novalidate>
+      <!-- Example CSRF token field for server frameworks (replace on server) -->
+      <!-- <input type="hidden" name="csrfToken" value="{{csrfToken}}"> -->
+
+      <div class="full">
+        <label for="fullName">Full name <span aria-hidden="true">*</span></label>
+        <input id="fullName" name="fullName" type="text" autocomplete="name" required maxlength="100" placeholder="Your full name">
+      </div>
+
+      <div>
+        <label for="phone">Phone number <span aria-hidden="true">*</span></label>
+        <input id="phone" name="phone" type="tel" inputmode="tel"
+               pattern="^\+?[0-9\s\-()]{7,20}$"
+               required placeholder="+1 234 567 8901" aria-describedby="phoneHelp">
+        <div id="phoneHelp" class="note">Include country code if outside the US. Numbers, spaces, dashes and parentheses allowed.</div>
+      </div>
+
+      <div>
+        <label for="email">Email address <span aria-hidden="true">*</span></label>
+        <input id="email" name="email" type="email" autocomplete="email" required placeholder="you@example.com">
+      </div>
+
+      <div>
+        <label for="nationality">Nationality</label>
+        <input id="nationality" name="nationality" type="text" placeholder="Your nationality" maxlength="60">
+      </div>
+
+      <div>
+        <label for="experience">OTR experience (years)</label>
+        <input id="experience" name="experience" type="number" min="0" max="50" step="1" placeholder="0">
+      </div>
+
+      <div>
+        <label for="weeklyMiles">Weekly miles preferred</label>
+        <select id="weeklyMiles" name="weeklyMiles" aria-label="Weekly miles">
+          <option value="">Choose target miles</option>
+          <option value="4000">4000</option>
+          <option value="4500">4500</option>
+          <option value="5000">5000</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="eld">ELD Agreement</label>
+        <select id="eld" name="eld" required aria-required="true">
+          <option value="">Select</option>
+          <option value="agreed">Agreed</option>
+          <option value="not-agreed">Not agreed</option>
+        </select>
+      </div>
+
+      <div class="full">
+        <label for="notes">Additional notes (optional)</label>
+        <input id="notes" name="notes" type="text" placeholder="Any additional information (equipment preferences, endorsements, etc.)">
+      </div>
+
+      <div id="errorBox" class="errors" role="alert" aria-live="polite"></div>
+
+      <div class="actions">
+        <button type="submit">Submit Application</button>
+        <div class="status" id="formStatus" aria-live="polite"></div>
+      </div>
+    </form>
+  </main>
+
+<script>
+(function(){
+  const form = document.getElementById('applicationForm');
+  const errorBox = document.getElementById('errorBox');
+  const status = document.getElementById('formStatus');
+
+  function showErrors(errors){
+    errorBox.style.display = 'block';
+    errorBox.innerHTML = errors.map(e => '<div>• ' + e + '</div>').join('');
+  }
+  function clearErrors(){
+    errorBox.style.display = 'none';
+    errorBox.innerHTML = '';
+  }
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    clearErrors();
+    status.textContent = '';
+
+    // Client-side validation via Constraint Validation API
+    if (!form.checkValidity()){
+      // Collect visible validation messages
+      const invalid = Array.from(form.elements).filter(el => el.willValidate && !el.validity.valid);
+      const messages = invalid.map(el => {
+        const label = document.querySelector('label[for="'+el.id+'"]');
+        const name = label ? label.textContent.replace('*','').trim() : el.name;
+        if (el.validity.valueMissing) return `${name} is required.`;
+        if (el.validity.typeMismatch) return `${name} is not formatted correctly.`;
+        if (el.validity.patternMismatch) return `${name} contains invalid characters.`;
+        return `${name} is invalid.`;
+      });
+      showErrors(messages);
+      invalid[0].focus();
+      return;
+    }
+
+    // Prepare payload
+    const data = Object.fromEntries(new FormData(form).entries());
+
+    // Show sending state
+    status.textContent = 'Sending...';
+
+    try{
+      // Replace with your real API endpoint on the server that does server-side validation + persistence
+      const resp = await fetch(form.action, {
+        method: form.method || 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      if (!resp.ok){
+        const json = await resp.json().catch(()=>({message: 'Server error'}));
+        showErrors([ json.message || 'Server returned an error. Please try again later.']);
+        status.textContent = '';
+        return;
+      }
+
+      const result = await resp.json().catch(()=>({ok:true}));
+      status.textContent = 'Application submitted — thank you!';
+      form.reset();
+
+    } catch(err){
+      showErrors(['Network error. Please check your connection and try again.']);
+      status.textContent = '';
+    }
+  });
+})();
+</script>
+</body>
+</html>
